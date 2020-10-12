@@ -28,17 +28,17 @@ xlEdgeTop = 8
 xlInsideHorizontal = 12
 xlInsideVertical = 11
 
-##############################################################################
-##############################################################################
+#############################################################################
+#############################################################################
 # useful functions
 def defined(var):
     return(var != None)
 
-##############################################################################
+#############################################################################
 def atoi(text):
     return int(text) if text.isdigit() else text
 
-##############################################################################
+#############################################################################
 def deepcopy(obj):
   return(
     js.loads(js.dumps(obj))
@@ -48,7 +48,7 @@ def deepcopy(obj):
 def mkType(t_name='C'):  # Make a type to be used as a dict
     return(type(t_name, (object,), {}))
 
-##############################################################################
+#############################################################################
 def readFile(fname):
     #print('Filename',fname)
     with open(fname, 'r') as f:
@@ -63,7 +63,12 @@ def getFilename(filter=None):
   if not defined(filter):
     filter = 'All: *.*\0*.*\0'
 
-  boxDialog = gui.GetOpenFileNameW(None,None,filter,None,1,None,1024,cwd)
+  try:
+    boxDialog = gui.GetOpenFileNameW(None,None,filter,None,1,None,1024,cwd)
+  except:
+    print('Filename selection aborted')
+    exit(1)
+  #
   #print('DialogBox output: ',boxDialog)
   file = list(boxDialog)[0]
   filename = basename(file)
@@ -72,11 +77,19 @@ def getFilename(filter=None):
 
   return((pathname, filename))
 
-##############################################################################
+#############################################################################
 # A generic object
 # C = type('C', (object,), {})
 class Parms(object):  # Called Parms, short for "Parameters"
     def copy(self):  # make it easy to make copies of this object
         return(copy(self))
 
-##############################################################################
+#############################################################################
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+#############################################################################
