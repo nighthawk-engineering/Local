@@ -56,13 +56,41 @@ def readFile(fname):
     return(s)
 
 #############################################################################
-def getFilename(filter=None):
+def getFilename_old(filter=None):
   cwd = getcwd()
   #print('CWD: ',cwd); exit(1)
 
   if not defined(filter):
     filter = 'All: *.*\0*.*\0'
 
+  try:
+    boxDialog = gui.GetOpenFileNameW(None,None,filter,None,1,None,1024,cwd)
+  except:
+    print('Filename selection aborted')
+    exit(1)
+  #
+  #print('DialogBox output: ',boxDialog)
+  file = list(boxDialog)[0]
+  filename = basename(file)
+  pathname = dirname(file)
+  #print('%s\%s'%(pathname,filename))
+
+  return((pathname, filename))
+
+#############################################################################
+def getFilename(filter=None):
+  cwd = getcwd()
+  #print('CWD: ',cwd); exit(1)
+
+  if not defined(filter):
+    filter = 'All: *.*\0*.*\0' # Default filename filter
+  elif type(filter) == type(list()): # If filter is list form...
+    f = ""
+    for t in filter:
+      f = "\0".join([f,"\0".join(t)])
+    filter = f + "\0"
+  #print("filter:",filter); exit(1)
+  
   try:
     boxDialog = gui.GetOpenFileNameW(None,None,filter,None,1,None,1024,cwd)
   except:
@@ -91,5 +119,13 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+#############################################################################
+def passbyval(func):
+  def new(*args, **kwargs):
+    cargs = [deepcopy(arg) for arg in args]
+    ckwargs = {k: deepcopy(v) for k,v in kwargs.items()}
+    return func(*cargs, **ckwargs)
+  return new
 
 #############################################################################
