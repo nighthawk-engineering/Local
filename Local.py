@@ -55,6 +55,13 @@ def readFile(fname):
         s = f.read()
     return(s)
 
+##############################################################################
+def readlnFile(fname):
+    #print('Filename',fname)
+    with open(fname, 'r') as f:
+        s = f.readlines()
+    return(s)
+
 #############################################################################
 def getFilename_old(filter=None):
   cwd = getcwd()
