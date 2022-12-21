@@ -128,3 +128,18 @@ def is_number(s):
         return False
 
 #############################################################################
+def is_hex(val, lbits=None): # does string 'val' have a hex value?
+  if type(val) != type(''):
+    return(None) # return 'None' if not a string
+  elif defined(lbits):
+    m = re.search('0x[0-9a-fA-F]{%d}'%lbits, val)
+    return(defined(m)) # return 'True' or 'False'
+  else:
+    m = re.search('0x[0-9a-fA-F_]', val)
+    return(defined(m)) # return 'True' or 'False'
+
+#############################################################################
+def defined(var):
+  return(var != None)
+
+################################################
