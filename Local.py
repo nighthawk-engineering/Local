@@ -7,11 +7,19 @@ Created on Fri Apr 26 2019
 
 from copy import copy
 import json as js
+import re
 from os.path import basename
 from os.path import dirname
 from os import getcwd
+from getopt import getopt, GetoptError
+from sys import exit,stderr,stdout
+from platform import system
+
 # The next module comes from pywin32: 'pip install pywin32'
-import win32gui as gui
+if 'Windows' in system():
+  import win32gui as gui
+
+VERSION = "v1.2" # 7/21/2023
 
 #############################################################################
 #############################################################################
@@ -115,31 +123,58 @@ def getFilename(filter=None):
 #############################################################################
 # A generic object
 # C = type('C', (object,), {})
-class Parms(object):  # Called Parms, short for "Parameters"
-    def copy(self):  # make it easy to make copies of this object
-        return(copy(self))
+class Struct(object):  # 
+  def copy(self):      # make it easy to make copies of this object
+    return(copy(self))
+
+class Parms(Struct):   # Called Parms, short for "Parameters"
+  None
 
 #############################################################################
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
+def isNumber(s):
+  try:
+    float(s)
+    return True
+  except ValueError:
+    return False
 
 #############################################################################
-def is_hex(val, lbits=None): # does string 'val' have a hex value?
+def isHex(val, lbits=None): # does string 'val' have a hex value?
   if type(val) != type(''):
     return(None) # return 'None' if not a string
   elif defined(lbits):
-    m = re.search('0x[0-9a-fA-F]{%d}'%lbits, val)
-    return(defined(m)) # return 'True' or 'False'
+    pattern = '^0x[0-9a-fA-F]{%d}$'%lbits
   else:
-    m = re.search('0x[0-9a-fA-F_]', val)
-    return(defined(m)) # return 'True' or 'False'
+    pattern = '^0x[0-9a-fA-F_]+$'
+  m = re.search(pattern, val)
+  return(defined(m)) # return 'True' or 'False'
 
 #############################################################################
-def defined(var):
-  return(var != None)
+def getOpts(args, options=None):
+  opts={}
+  if not defined(options):
+    print('**Error: missing \'options\' keyword')
+    print('** getOpts needs a list of options')
+    exit(1)
 
-################################################
+  try:
+    optlist, args = getopt(args, options+'h')
+    # print('optlist',str(optlist),'\nargs',str(args));exit(1)
+  except GetoptError as err:
+    print('Error:',err,'\n', file=stderr)
+    # showHelp();exit(1)
+    raise Exception('showHelp')
+  #
+  if '-h' in [x[0] for x in optlist]:
+    # showHelp();exit(0)
+    raise Exception('showHelp')
+  #
+  return({x[0]:x[1] for x in optlist})
+
+#############################################################################
+def sprint(*args, end='', **kwargs):
+  sio = io.StringIO()
+  print(*args, **kwargs, end=end, file=sio)
+  return sio.getvalue()
+    
+#############################################################################
